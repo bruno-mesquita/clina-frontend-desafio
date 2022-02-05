@@ -112,7 +112,7 @@ const Auth = () => {
               mt="20px"
               bg="#7A35FF"
               color="#fff"
-              type="button"
+              type="submit"
               _hover={{ bg: '#6c2cec' }}
             >
               Entrar
