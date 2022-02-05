@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { NextPage, GetServerSideProps } from 'next';
 import Image from 'next/image';
 import Router from 'next/router';
 import {
@@ -16,6 +17,7 @@ import {
 import { Field, Formik, Form, ErrorMessage } from 'formik';
 import { BsEyeSlash, BsEye } from 'react-icons/bs';
 import { setCookie } from 'nookies';
+import nookies from 'nookies';
 
 import api from '@services/api';
 
@@ -24,7 +26,7 @@ type IValues = {
   password: string;
 };
 
-const Auth = () => {
+const Auth: NextPage = () => {
   const toast = useToast({ position: 'top-right' });
 
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -144,6 +146,26 @@ const Auth = () => {
       </Flex>
     </Flex>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  // Parse
+  const cookies = nookies.get(ctx);
+
+  if (cookies.token) {
+    api.defaults.headers.common.Authorization = cookies.token;
+
+    return {
+      redirect: {
+        destination: '/',
+        permanent: true,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
 };
 
 export default Auth;
