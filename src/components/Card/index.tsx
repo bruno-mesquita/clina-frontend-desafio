@@ -1,19 +1,15 @@
 import Image from 'next/image';
 import Router from 'next/router';
-
 import { Flex, Text, Button } from '@chakra-ui/react';
 
 interface ICardProps {
   id: number;
   name: string;
   image: string;
-  address: {
-    state: string;
-    city: string;
-  };
+  address: string;
 }
 
-export const Card = ({}: ICardProps) => {
+export const Card = ({ name, image, address }: ICardProps) => {
   return (
     <Flex
       bg="#fff"
@@ -21,6 +17,7 @@ export const Card = ({}: ICardProps) => {
       align="center"
       shadow="xs"
       justify="space-between"
+      mt="40px"
     >
       <Flex
         pos="relative"
@@ -29,14 +26,14 @@ export const Card = ({}: ICardProps) => {
         rounded="5px"
         overflow="hidden"
       >
-        <Image src="/exemplo-sala.jpg" layout="fill" alt="Exemplo" />
+        <Image src={image} layout="fill" alt="Exemplo" />
       </Flex>
       <Flex flexDir="column">
         <Text fontSize={['13px', '13px', '16px', '22px']} fontWeight={600}>
-          Nome do consultório - Sala 01
+          {name}
         </Text>
         <Text fontSize={['13px', '13px', '14px']} color="#4F4F4F">
-          Em Bela Vista, SP
+          {address}
         </Text>
       </Flex>
       <Flex

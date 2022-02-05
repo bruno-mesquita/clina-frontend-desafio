@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
+import Router from 'next/router';
 import {
   Flex,
   Input,
@@ -14,6 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { Field, Formik, Form, ErrorMessage } from 'formik';
 import { BsEyeSlash, BsEye } from 'react-icons/bs';
+import { setCookie } from 'nookies';
 
 import api from '@services/api';
 
@@ -32,9 +34,13 @@ const Auth = () => {
     password: '',
   };
 
-  const onSubmit = (values: IValues) => {
+  const onSubmit = async (values: IValues) => {
     try {
-      api.post('/auth', values);
+      const { data } = await api.post('/auth', values);
+
+      setCookie(null, 'token', data.token, { path: '/' });
+
+      Router.push('/');
     } catch (err) {
       toast({ title: 'Erro!', description: 'Erro ao fazer login' });
     }

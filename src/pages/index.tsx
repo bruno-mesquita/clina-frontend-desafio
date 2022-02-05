@@ -1,13 +1,40 @@
 import { useState } from 'react';
-import type { NextPage } from 'next';
+import type { NextPage, GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { Text, Flex, FormControl, Select, FormLabel } from '@chakra-ui/react';
 import { HiOutlineLocationMarker } from 'react-icons/hi';
+import nookies from 'nookies';
+import DatePicker from 'react-datepicker';
+
+import 'react-datepicker/dist/react-datepicker.css';
 
 import { Header, Card } from '@components';
+import api from '@services/api';
 
 const Home: NextPage = () => {
   const [period, setPeriod] = useState('Todos');
+  const [startDate, setStartDate] = useState('');
+
+  const [items] = useState([
+    {
+      id: 1,
+      name: 'Nome do consultório - Sala 01',
+      address: 'Em Bela Vista, SP',
+      image: '/exemplo-sala.jpg',
+    },
+    {
+      id: 2,
+      name: 'Nome do consultório - Sala 02',
+      address: 'Em Bela Vista, SP',
+      image: '/exemplo-sala.jpg',
+    },
+    {
+      id: 3,
+      name: 'Nome do consultório - Sala 03',
+      address: 'Em Bela Vista, SP',
+      image: '/exemplo-sala.jpg',
+    },
+  ]);
 
   return (
     <>
@@ -17,7 +44,12 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
-      <Flex bg="#FAFAFA" flexDir="column" px={['20px', '20px', '50px', '80px']}>
+      <Flex
+        pb="40px"
+        bg="#FAFAFA"
+        flexDir="column"
+        px={['20px', '20px', '50px', '80px']}
+      >
         <Text fontWeight={600} fontSize="22px">
           Nossas salas disponíveis agora.
         </Text>
@@ -36,13 +68,14 @@ const Home: NextPage = () => {
             <Select
               rounded="3px"
               variant="outline"
-              value={period}
-              onChange={({ target }) => setPeriod(target.value)}
+              value={startDate}
+              onChange={({ target }) => setStartDate(target.value)}
             >
-              <option value="Manhã">Manhã</option>
-              <option value="Tarde">Tarde</option>
-              <option value="Noite">Noite</option>
-              <option value="Todos">Todos</option>
+              <option value="2022/02/08">2022/02/08</option>
+              <option value="2022/02/09">2022/02/09</option>
+              <option value="2022/02/10">2022/02/10</option>
+              <option value="2022/02/11">2022/02/11</option>
+              <option value="2022/02/12">2022/02/12</option>
             </Select>
           </FormControl>
           <FormControl w="40%">
@@ -63,11 +96,33 @@ const Home: NextPage = () => {
           </FormControl>
         </Flex>
         <Flex flexDir="column" mt="50px">
-          <Card />
+          {items.map((item) => (
+            <Card key={item.id} {...item} />
+          ))}
         </Flex>
       </Flex>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  // Parse
+  const cookies = nookies.get(ctx);
+
+  if (cookies.token) {
+    api.defaults.headers.common.Authorization = cookies.token;
+
+    return {
+      props: {},
+    };
+  }
+
+  return {
+    redirect: {
+      destination: '/auth',
+      permanent: true,
+    },
+  };
 };
 
 export default Home;

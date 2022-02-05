@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import type { NextPage } from 'next';
+import type { FC } from 'react';
+import type { NextPage, GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Router from 'next/router';
 import {
@@ -12,6 +13,8 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { MdChevronLeft } from 'react-icons/md';
+import nookies from 'nookies';
+import api from '@services/api';
 
 import { Header, EndBookingCard } from '@components';
 
@@ -21,8 +24,8 @@ const days = [
     day: '02',
     month: 'março',
     periods: [
-      { title: 'Manhã', hours: ['10:00 as 11:00', '11:00 as 12:00'] },
-      { title: 'Tarde', hours: ['14:00 as 15:00', '15:00 as 16:00'] },
+      { title: 'Manhã', hours: ['8:00 as 9:00', '9:00 as 10:00'] },
+      { title: 'Tarde', hours: ['12:00 as 13:00', '13:00 as 14:00'] },
     ],
   },
   {
@@ -36,24 +39,58 @@ const days = [
   },
 ];
 
+const HourItem: FC<{ isSelected: boolean; onClick: () => void }> = ({
+  children,
+  isSelected = false,
+  onClick,
+}) => {
+  const colorSecondary = isSelected ? '#7A35FF' : '#fff';
+  const colorPrimary = isSelected ? '#fff' : '#7A35FF';
+
+  return (
+    <Flex
+      onClick={onClick}
+      cursor="pointer"
+      transition="background 0.2s"
+      _hover={{ bg: colorPrimary }}
+      mr="20px"
+      bg={colorSecondary}
+      rounded="5px"
+      shadow="xs"
+      p="10px"
+    >
+      <Text
+        color={isSelected ? '#fff' : '#000'}
+        _hover={{ color: isSelected ? '#7A35FF' : '#fff' }}
+        px="20px"
+      >
+        {children}
+      </Text>
+    </Flex>
+  );
+};
+
 const DetailRoom: NextPage = () => {
   const toast = useToast({ position: 'top-right' });
 
   const [period, setPeriod] = useState('Todos');
   const [loading, setLoading] = useState(false);
 
+  const [itemsSelecteds, setItemsSelecteds] = useState<string[]>([]);
+
+  const onChangeItems = (item: string) => {
+    const index = itemsSelecteds.findIndex((e) => e === item);
+
+    if (index === -1) setItemsSelecteds((old) => [...old, item]);
+    else setItemsSelecteds((old) => old.filter((e) => e !== item));
+  };
+
   const onSubmit = () => {
-    try {
-      setLoading(true);
-    } catch (err) {
-      toast({
-        title: 'Erro!',
-        description: 'Parece que houve um erro ao fazer sua reserva :(',
-        status: 'error',
-      });
-    } finally {
+    setLoading(true);
+    setTimeout(() => {
       setLoading(false);
-    }
+      toast({ title: 'Sucesso!', description: 'Reserva feita com sucesso' });
+    }, 2000);
   };
 
   return (
@@ -100,10 +137,11 @@ const DetailRoom: NextPage = () => {
                 value={period}
                 onChange={({ target }) => setPeriod(target.value)}
               >
-                <option value="Manhã">Manhã</option>
-                <option value="Tarde">Tarde</option>
-                <option value="Noite">Noite</option>
-                <option value="Todos">Todos</option>
+                <option value="2022/02/08">2022/02/08</option>
+                <option value="2022/02/09">2022/02/09</option>
+                <option value="2022/02/10">2022/02/10</option>
+                <option value="2022/02/11">2022/02/11</option>
+                <option value="2022/02/12">2022/02/12</option>
               </Select>
             </FormControl>
             <FormControl w="40%" isDisabled>
@@ -137,21 +175,13 @@ const DetailRoom: NextPage = () => {
                   </Text>
                   <Flex>
                     {period.hours.map((hour) => (
-                      <Flex
-                        cursor="pointer"
-                        transition="background 0.2s"
-                        _hover={{ bg: '#7A35FF' }}
-                        mr="20px"
-                        bg="#fff"
-                        rounded="5px"
+                      <HourItem
+                        isSelected={!!itemsSelecteds.find((e) => e === hour)}
+                        onClick={() => onChangeItems(hour)}
                         key={hour}
-                        shadow="xs"
-                        p="10px"
                       >
-                        <Text _hover={{ color: '#fff' }} px="20px">
-                          {hour}
-                        </Text>
-                      </Flex>
+                        {hour}
+                      </HourItem>
                     ))}
                   </Flex>
                 </>
@@ -163,6 +193,26 @@ const DetailRoom: NextPage = () => {
       </Flex>
     </Flex>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  // Parse
+  const cookies = nookies.get(ctx);
+
+  if (cookies.token) {
+    api.defaults.headers.common.Authorization = cookies.token;
+
+    return {
+      props: {},
+    };
+  }
+
+  return {
+    redirect: {
+      destination: '/auth',
+      permanent: true,
+    },
+  };
 };
 
 export default DetailRoom;

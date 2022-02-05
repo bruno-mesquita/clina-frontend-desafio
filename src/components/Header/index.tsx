@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Router from 'next/router';
 import {
   Flex,
   Avatar,
@@ -9,8 +10,14 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import { BiChevronDown } from 'react-icons/bi';
+import { destroyCookie } from 'nookies';
 
 export const Header = () => {
+  const logout = () => {
+    destroyCookie(null, 'token');
+    Router.reload();
+  };
+
   return (
     <Flex align="center" px="80px" mb="30px" justify="space-between">
       <Flex align="center">
@@ -29,7 +36,7 @@ export const Header = () => {
           </MenuButton>
           <MenuList>
             <MenuItem>Perfil</MenuItem>
-            <MenuItem>Sair</MenuItem>
+            <MenuItem onClick={logout}>Sair</MenuItem>
           </MenuList>
         </Menu>
       </Flex>
