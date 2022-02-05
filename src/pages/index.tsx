@@ -4,9 +4,6 @@ import Head from 'next/head';
 import { Text, Flex, FormControl, Select, FormLabel } from '@chakra-ui/react';
 import { HiOutlineLocationMarker } from 'react-icons/hi';
 import nookies from 'nookies';
-import DatePicker from 'react-datepicker';
-
-import 'react-datepicker/dist/react-datepicker.css';
 
 import { Header, Card } from '@components';
 import api from '@services/api';
