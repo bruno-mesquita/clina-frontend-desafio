@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Router from 'next/router';
 
 import { Flex, Text, Button } from '@chakra-ui/react';
 
@@ -57,6 +58,7 @@ export const Card = ({}: ICardProps) => {
         </Flex>
       </Flex>
       <Button
+        onClick={() => Router.push('/detalhes-sala')}
         display={['none', 'none', 'block']}
         mr={['10px', '20px', '30px', '40px']}
         px={['10px', '20px', '30px', '50px']}

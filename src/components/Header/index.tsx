@@ -6,10 +6,6 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  MenuItemOption,
-  MenuGroup,
-  MenuOptionGroup,
-  MenuDivider,
   IconButton,
 } from '@chakra-ui/react';
 import { BiChevronDown } from 'react-icons/bi';
